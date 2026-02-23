@@ -1,5 +1,4 @@
-﻿const API_URL = 'http://localhost:3000/produtos';
-const STORAGE_KEY = 'produtos_moda_local';
+﻿const API_URL = '/produtos';
 
 const lista = document.getElementById('lista-produtos');
 const mensagem = document.getElementById('mensagem');
@@ -31,21 +30,6 @@ function cardProduto(produto) {
   `;
 }
 
-function lerProdutosLocal() {
-  const bruto = localStorage.getItem(STORAGE_KEY);
-  if (!bruto) return [];
-
-  try {
-    return JSON.parse(bruto);
-  } catch (_erro) {
-    return [];
-  }
-}
-
-function salvarProdutosLocal(produtos) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(produtos));
-}
-
 function renderizarProdutos(produtos) {
   if (produtos.length === 0) {
     lista.innerHTML = '';
@@ -57,49 +41,39 @@ function renderizarProdutos(produtos) {
   lista.innerHTML = produtos.map(cardProduto).join('');
 }
 
-async function buscarProdutosApi() {
-  const resposta = await fetch(API_URL);
-  if (!resposta.ok) {
-    throw new Error('Falha ao buscar produtos.');
-  }
-  return resposta.json();
-}
-
 async function apagarProduto(id) {
   try {
     mensagem.textContent = 'Apagando produto...';
     const resposta = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    const dados = await resposta.json();
 
     if (!resposta.ok) {
-      const dados = await resposta.json();
       throw new Error(dados.erro || 'Falha ao apagar produto.');
     }
 
     mensagem.textContent = 'Produto apagado com sucesso.';
     await carregarProdutos();
-  } catch (_erro) {
-    const produtos = lerProdutosLocal();
-    const atualizados = produtos.filter((produto) => String(produto.id) !== String(id));
-    salvarProdutosLocal(atualizados);
-    renderizarProdutos(atualizados);
-    mensagem.textContent = 'API offline: produto apagado no modo local.';
+  } catch (erro) {
+    mensagem.textContent = erro.message || 'Erro ao apagar produto.';
+    console.error(erro);
   }
 }
 
 async function carregarProdutos() {
   try {
     mensagem.textContent = 'Carregando produtos...';
-    const produtos = await buscarProdutosApi();
-    salvarProdutosLocal(produtos);
-    renderizarProdutos(produtos);
-  } catch (_erro) {
-    const produtosLocal = lerProdutosLocal();
-    renderizarProdutos(produtosLocal);
-    if (produtosLocal.length > 0) {
-      mensagem.textContent = 'API offline: exibindo produtos locais.';
-    } else {
-      mensagem.textContent = 'API offline e sem dados locais.';
+    const resposta = await fetch(API_URL);
+
+    if (!resposta.ok) {
+      throw new Error('Falha ao buscar produtos no MySQL.');
     }
+
+    const produtos = await resposta.json();
+    renderizarProdutos(produtos);
+  } catch (erro) {
+    mensagem.textContent = erro.message || 'Erro ao carregar produtos.';
+    lista.innerHTML = '';
+    console.error(erro);
   }
 }
 

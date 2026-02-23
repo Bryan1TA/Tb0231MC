@@ -1,4 +1,5 @@
 ﻿const express = require('express');
+const path = require('path');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -6,9 +7,11 @@ const db = require('./db');
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
+const FRONTEND_DIR = path.join(__dirname, '..', 'frontend');
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(FRONTEND_DIR));
 
 app.get('/produtos', async (_req, res) => {
   try {
@@ -24,10 +27,11 @@ app.get('/produtos', async (_req, res) => {
 
 app.post('/produtos', async (req, res) => {
   const { nome, categoria, marca, preco, descricao, imagem_url } = req.body;
+  const precoNumerico = Number(preco);
 
-  if (!nome || !categoria || !marca || preco === undefined) {
+  if (!nome || !categoria || !marca || Number.isNaN(precoNumerico)) {
     return res.status(400).json({
-      erro: 'Campos obrigatorios: nome, categoria, marca e preco.'
+      erro: 'Campos obrigatorios: nome, categoria, marca e preco valido.'
     });
   }
 
@@ -36,7 +40,7 @@ app.post('/produtos', async (req, res) => {
       `INSERT INTO produtos_moda
        (nome, categoria, marca, preco, descricao, imagem_url)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [nome, categoria, marca, preco, descricao || null, imagem_url || null]
+      [nome, categoria, marca, precoNumerico, descricao || null, imagem_url || null]
     );
 
     res.status(201).json({
@@ -50,7 +54,11 @@ app.post('/produtos', async (req, res) => {
 });
 
 app.delete('/produtos/:id', async (req, res) => {
-  const { id } = req.params;
+  const id = Number(req.params.id);
+
+  if (Number.isNaN(id)) {
+    return res.status(400).json({ erro: 'ID invalido.' });
+  }
 
   try {
     const [result] = await db.query('DELETE FROM produtos_moda WHERE id = ?', [id]);
@@ -64,6 +72,14 @@ app.delete('/produtos/:id', async (req, res) => {
     console.error('Erro ao apagar produto:', error.message);
     res.status(500).json({ erro: 'Nao foi possivel apagar o produto.' });
   }
+});
+
+app.get('/cadastro', (_req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'cadastro.html'));
+});
+
+app.get('/', (_req, res) => {
+  res.sendFile(path.join(FRONTEND_DIR, 'index.html'));
 });
 
 app.listen(PORT, () => {

@@ -1,30 +1,7 @@
-﻿const API_URL = 'http://localhost:3000/produtos';
-const STORAGE_KEY = 'produtos_moda_local';
+﻿const API_URL = '/produtos';
 
 const form = document.getElementById('form-produto');
 const mensagem = document.getElementById('mensagem');
-
-function lerProdutosLocal() {
-  const bruto = localStorage.getItem(STORAGE_KEY);
-  if (!bruto) return [];
-
-  try {
-    return JSON.parse(bruto);
-  } catch (_erro) {
-    return [];
-  }
-}
-
-function salvarProdutosLocal(produtos) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(produtos));
-}
-
-function persistirProdutoLocal(produto) {
-  const produtos = lerProdutosLocal();
-  const atualizados = produtos.filter((item) => String(item.id) !== String(produto.id));
-  atualizados.unshift(produto);
-  salvarProdutosLocal(atualizados);
-}
 
 function validarPayload(payload) {
   if (!payload.nome || !payload.categoria || !payload.marca || Number.isNaN(payload.preco)) {
@@ -60,25 +37,10 @@ form.addEventListener('submit', async (event) => {
       throw new Error(dados.erro || 'Falha no cadastro.');
     }
 
-    const produtoSalvo = {
-      id: dados.id || Date.now(),
-      ...payload
-    };
-    persistirProdutoLocal(produtoSalvo);
-    mensagem.textContent = 'Produto cadastrado com sucesso!';
+    mensagem.textContent = 'Produto cadastrado com sucesso no MySQL!';
     form.reset();
   } catch (erro) {
-    try {
-      validarPayload(payload);
-      const novoProduto = {
-        id: Date.now(),
-        ...payload
-      };
-      persistirProdutoLocal(novoProduto);
-      mensagem.textContent = 'API offline: produto salvo no modo local.';
-      form.reset();
-    } catch (erroLocal) {
-      mensagem.textContent = erroLocal.message || erro.message;
-    }
+    mensagem.textContent = erro.message || 'Erro ao cadastrar produto.';
+    console.error(erro);
   }
 });
