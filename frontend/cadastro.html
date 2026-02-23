@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moda Urbana | Cadastro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <header class="hero hero--small">
+    <div class="hero__overlay"></div>
+    <nav class="nav container">
+      <h1 class="brand">Moda Urbana</h1>
+      <div class="nav__links">
+        <a href="./index.html">Produtos</a>
+        <a href="./cadastro.html" class="active">Cadastrar</a>
+      </div>
+    </nav>
+    <div class="hero__content container">
+      <p class="tagline">Novo item fashion</p>
+      <h2>Cadastre produtos, filmes e musicas com estilo</h2>
+    </div>
+  </header>
+
+  <main class="container content">
+    <section class="section-head">
+      <h2>Cadastrar Produto</h2>
+      <p>Adicione itens ao catalogo fashion com detalhes de marca e estilo.</p>
+    </section>
+
+    <form id="form-produto" class="form-card">
+      <div class="field">
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" required placeholder="Ex.: Jaqueta Oversized" />
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="categoria">Categoria</label>
+          <input type="text" id="categoria" required placeholder="Ex.: Roupa, Filme, Musica" />
+        </div>
+        <div class="field">
+          <label for="marca">Marca/Artista</label>
+          <input type="text" id="marca" required placeholder="Ex.: Vogue, Dior, Beyonce" />
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="preco">Preco</label>
+          <input type="number" id="preco" step="0.01" min="0" required placeholder="0.00" />
+        </div>
+        <div class="field">
+          <label for="imagem_url">URL da imagem (opcional)</label>
+          <input type="url" id="imagem_url" placeholder="https://..." />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="descricao">Descricao (opcional)</label>
+        <textarea id="descricao" rows="4" placeholder="Detalhes da peca, referencia cultural, etc."></textarea>
+      </div>
+
+      <button type="submit" class="btn">Salvar Produto</button>
+      <p id="mensagem" class="mensagem"></p>
+    </form>
+  </main>
+
+  <script src="./js/cadastrar.js"></script>
+</body>
+</html>
