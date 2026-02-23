@@ -4,8 +4,8 @@ const form = document.getElementById('form-produto');
 const mensagem = document.getElementById('mensagem');
 
 function validarPayload(payload) {
-  if (!payload.nome || !payload.categoria || !payload.marca || Number.isNaN(payload.preco)) {
-    throw new Error('Preencha nome, categoria, marca e preco corretamente.');
+  if (!payload.nome || !payload.categoria || Number.isNaN(payload.preco)) {
+    throw new Error('Preencha nome, categoria e preco corretamente.');
   }
 }
 

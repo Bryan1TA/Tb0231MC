@@ -28,10 +28,11 @@ app.get('/produtos', async (_req, res) => {
 app.post('/produtos', async (req, res) => {
   const { nome, categoria, marca, preco, descricao, imagem_url } = req.body;
   const precoNumerico = Number(preco);
+  const marcaFinal = String(marca || '').trim() || 'Sem marca';
 
-  if (!nome || !categoria || !marca || Number.isNaN(precoNumerico)) {
+  if (!nome || !categoria || Number.isNaN(precoNumerico)) {
     return res.status(400).json({
-      erro: 'Campos obrigatorios: nome, categoria, marca e preco valido.'
+      erro: 'Campos obrigatorios: nome, categoria e preco valido.'
     });
   }
 
@@ -40,7 +41,7 @@ app.post('/produtos', async (req, res) => {
       `INSERT INTO produtos_moda
        (nome, categoria, marca, preco, descricao, imagem_url)
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [nome, categoria, marca, precoNumerico, descricao || null, imagem_url || null]
+      [nome, categoria, marcaFinal, precoNumerico, descricao || null, imagem_url || null]
     );
 
     res.status(201).json({
